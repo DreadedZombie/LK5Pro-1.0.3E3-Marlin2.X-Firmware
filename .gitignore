@@ -171,3 +171,10 @@ __pycache__
 # Simulation / Native
 eeprom.dat
 imgui.ini
+
+# Claude Code artifacts
+.claude/
+
+# Personal dev notes (uncomment if you want to keep these private)
+# DWIN_UI_CUSTOMIZATION.md
+# WIFI_MODULE_INSTALLATION.md
