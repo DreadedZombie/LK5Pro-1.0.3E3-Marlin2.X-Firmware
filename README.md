@@ -22,17 +22,6 @@ Custom Marlin 2.0.x firmware for the Longer LK5 Pro with MKS Robin E3 v1.1 board
 
 **Note:** This firmware is specifically configured for the newer LK5 Pro models with the MKS Robin E3 v1.1 board. If you have an older model with MKS Robin Nano v3.5, you'll need different firmware.
 
-### Alternative: Klipper Firmware
-
-Looking for even better performance? Check out the **[Klipper configuration](https://github.com/DreadedZombie/LK5Pro-E3v1.1-Klipper-Firmware)** for this printer:
-- 3-5x faster print speeds
-- Input Shaping (eliminates ringing/ghosting)
-- Superior Pressure Advance
-- Modern web interface (Mainsail/Fluidd)
-- Complete installation guide from scratch
-
-Visit: **https://github.com/DreadedZombie/LK5Pro-E3v1.1-Klipper-Firmware**
-
 ## Improvements Over Stock Firmware
 
 This custom firmware includes advanced Marlin 2.0 features not available in the stock LONGER3D firmware:
