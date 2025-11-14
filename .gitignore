@@ -178,3 +178,8 @@ imgui.ini
 # Personal dev notes (uncomment if you want to keep these private)
 # DWIN_UI_CUSTOMIZATION.md
 # WIFI_MODULE_INSTALLATION.md
+KLIPPER_CONVERSION_GUIDE.md
+MARLIN_2.1_UPGRADE_GUIDE.md
+
+# Klipper conversion project (separate git repo will be created)
+/klipper/
