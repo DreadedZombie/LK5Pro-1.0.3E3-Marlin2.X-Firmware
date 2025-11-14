@@ -1,8 +1,10 @@
-# LK5 Pro - Dual Blower + BLTouch - Marlin 2.0 Firmware
+# LK5 Pro - Dual Blower + BLTouch - Marlin 2.1 Firmware
 
-Custom Marlin 2.0.x firmware for the Longer LK5 Pro with MKS Robin E3 v1.1 board.
+Custom Marlin 2.1.2.5 firmware for the Longer LK5 Pro with MKS Robin E3 v1.1 board.
 
 **Maintained by:** [DreadedZombie](https://github.com/DreadedZombie)
+
+> **Status:** Branch rebuilt from the original 1.0.3E3 (Marlin 2.0.9.2) baseline and upgraded in-place to Marlin 2.1.2.5 with the stock LGT/DWIN touchscreen enabled and BLTouch left disabled.
 
 ## Hardware Compatibility
 
@@ -28,7 +30,7 @@ This custom firmware includes advanced Marlin 2.0 features not available in the 
 
 ### Print Quality Enhancements
 - **Linear Advance** - Compensates for extruder pressure dynamics, improves line quality at corners and direction changes (M900 K-factor tunable)
-- **S-Curve Acceleration** - Applies Bézier curve acceleration for smoother motion and reduced vibrations
+- **S-Curve Acceleration** (optional) - Disabled by default to match the original LK5 motion tuning, but available if you want smoother acceleration profiles
 - **Arc Support (G2/G3)** - Native arc commands for smoother curved geometry and smaller file sizes
 - **Firmware Retraction** - Consistent retraction control independent of slicer settings
 
@@ -116,7 +118,7 @@ This firmware is based on and builds upon the excellent work of:
 ### This Fork
 This repository adds:
 - Updated README with comprehensive documentation
-- Advanced Marlin 2.0 features (Linear Advance, S-Curve, Power Loss Recovery)
+- Advanced Marlin 2.0 features (Linear Advance, optional S-Curve, Power Loss Recovery)
 - Display firmware customization support
 - WiFi module installation guide
 - Enhanced build and flash instructions

@@ -33,6 +33,13 @@
 #define DEBUG_OUT ENABLED(DEBUG_LGTDWLCD)
 #include "../core/debug_out.h"
 
+namespace {
+  inline void clear_injected_commands() {
+    queue.inject_P(nullptr);
+    queue.inject("");
+  }
+}
+
 #ifdef MYSERIAL1
   #undef MYSERIAL1
 #endif
@@ -291,7 +298,7 @@ void LGT_SCR_DW::startPrint()
 	// filament runout handling
 	if (READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_STATE) {
 		if(READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_STATE) {
-			queue.enqueue_one_P(PSTR("M25"));
+			queue.enqueue_now_P(PSTR("M25"));
 			lgtLcdDw.LGT_Change_Page(ID_DIALOG_NO_FILA);
 			status_type = PRINTER_PAUSE;
 		}
@@ -1195,7 +1202,7 @@ void LGT_SCR_DW::processButton()
 			if (sel_fileid > -1)
 			{
 				// get filename
-				card.getfilename_sorted(gcode_id[sel_fileid]);
+				card.selectFileByIndexSorted(gcode_id[sel_fileid]);
 				card.openAndPrintFile(card.filename);
 
 
@@ -1223,7 +1230,7 @@ void LGT_SCR_DW::processButton()
 				// filament runout handling
 				if (READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_STATE) {
 					if(READ(FIL_RUNOUT_PIN) == FIL_RUNOUT_STATE) {
-						queue.enqueue_one_P(PSTR("M25"));
+						queue.enqueue_now_P(PSTR("M25"));
 				      	lgtLcdDw.LGT_Change_Page(ID_DIALOG_NO_FILA);
 						status_type = PRINTER_PAUSE;
 					}
@@ -1369,7 +1376,7 @@ void LGT_SCR_DW::processButton()
 			if (menu_type == eMENU_UTILI_FILA)
 				queue.clear();
 			else if (menu_type == eMENU_HOME_FILA) 
-				queue.clearInject();
+				clear_injected_commands();
 			wait_for_heatup = false;
 			if (menu_type == eMENU_UTILI_FILA)
 			{
@@ -1387,7 +1394,7 @@ void LGT_SCR_DW::processButton()
 			if (menu_type == eMENU_UTILI_FILA)
 				queue.clear();
 			else if (menu_type == eMENU_HOME_FILA) 
-				queue.clearInject();
+				clear_injected_commands();
 			quickstop_stepper();
 			delay(5);
 			if (menu_type == eMENU_UTILI_FILA)
@@ -1404,7 +1411,7 @@ void LGT_SCR_DW::processButton()
 			if (menu_type == eMENU_UTILI_FILA)
 				queue.clear();
 			else if (menu_type == eMENU_HOME_FILA) 
-				queue.clearInject();
+				clear_injected_commands();
 			quickstop_stepper();
 			delay(5);
 			if (menu_type == eMENU_UTILI_FILA)
@@ -1471,21 +1478,21 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28 X0 Y0"));
+					queue.enqueue_now_P(PSTR("G28 X0 Y0"));
 					xy_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 X50 Y50"));
+				queue.enqueue_now_P(PSTR("G1 X50 Y50"));
 			#elif defined(LK5_PRO)
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X50 Y50 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));		
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X50 Y50 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));		
 			#else  //LK4_PRO
 			// if (queue.length >= BUFSIZE)
 			// 	break;
@@ -1493,14 +1500,14 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G90"));
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G90"));
+					queue.enqueue_now_P(PSTR("G28"));
 
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X30 Y30 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X30 Y30 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));
 			#endif
 			break;
 		case eBT_UTILI_LEVEL_CORNER_POS_2: //45 002D
@@ -1509,33 +1516,33 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28 X0 Y0"));
+					queue.enqueue_now_P(PSTR("G28 X0 Y0"));
 					xy_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 X250 Y50"));
+				queue.enqueue_now_P(PSTR("G1 X250 Y50"));
 			#elif defined(LK5_PRO)
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X250 Y50 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));				
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X250 Y50 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));				
 			#else  //LK4_PRO
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G90"));
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G90"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X190 Y30 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X190 Y30 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));
 			#endif
 			break;
 		case eBT_UTILI_LEVEL_CORNER_POS_3:
@@ -1544,33 +1551,33 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28 X0 Y0"));
+					queue.enqueue_now_P(PSTR("G28 X0 Y0"));
 					xy_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 X250 Y250"));
+				queue.enqueue_now_P(PSTR("G1 X250 Y250"));
 			#elif defined(LK5_PRO)
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X250 Y250 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));					
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X250 Y250 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));					
 			#else  //LK4_PRO
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G90"));
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G90"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X190 Y190 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X190 Y190 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));
 			#endif
 			break;
 		case eBT_UTILI_LEVEL_CORNER_POS_4:
@@ -1579,33 +1586,33 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28 X0 Y0"));
+					queue.enqueue_now_P(PSTR("G28 X0 Y0"));
 					xy_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 X50 Y250"));		
+				queue.enqueue_now_P(PSTR("G1 X50 Y250"));		
 			#elif defined(LK5_PRO)
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X50 Y250 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));				
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X50 Y250 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));				
 			#else  //LK4_PRO
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G90"));
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G90"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X30 Y190 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));  
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X30 Y190 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));  
 			#endif
 			break;
 		case eBT_UTILI_LEVEL_CORNER_POS_5:
@@ -1614,45 +1621,45 @@ void LGT_SCR_DW::processButton()
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28 X0 Y0"));
+					queue.enqueue_now_P(PSTR("G28 X0 Y0"));
 					xy_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 X150 Y150"));			
+				queue.enqueue_now_P(PSTR("G1 X150 Y150"));			
 			#elif defined(LK5_PRO)
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X150 Y150 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));				
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X150 Y150 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));				
 			#else  //LK4_PRO
 				if (xyz_home == false)
 				{
 					thermalManager.setTargetHotend(0, eExtruder::E0);
 					thermalManager.setTargetBed(0);
-					queue.enqueue_one_P(PSTR("G90"));
-					queue.enqueue_one_P(PSTR("G28"));
+					queue.enqueue_now_P(PSTR("G90"));
+					queue.enqueue_now_P(PSTR("G28"));
 					xyz_home = true;
 				}
-				queue.enqueue_one_P(PSTR("G1 Z10 F500"));
-				queue.enqueue_one_P(PSTR("G1 X110 Y110 F3000"));
-				queue.enqueue_one_P(PSTR("G1 Z0 F300"));
+				queue.enqueue_now_P(PSTR("G1 Z10 F500"));
+				queue.enqueue_now_P(PSTR("G1 X110 Y110 F3000"));
+				queue.enqueue_now_P(PSTR("G1 Z0 F300"));
 			#endif
 			break;
 		case eBT_UTILI_LEVEL_CORNER_BACK:
 			#ifdef LK1_PRO
 				if (xy_home) {
 					xy_home = false;
-					queue.enqueue_one_P(PSTR("G1 Z10 F500"));	//up 10mm to prevent from damaging bed
+					queue.enqueue_now_P(PSTR("G1 Z10 F500"));	//up 10mm to prevent from damaging bed
 				}
 			#else
 				if (xyz_home) {
 					xyz_home = false;
-					queue.enqueue_one_P(PSTR("G1 Z10 F500"));	//up 10mm to prevent from damaging bed
+					queue.enqueue_now_P(PSTR("G1 Z10 F500"));	//up 10mm to prevent from damaging bed
 				}
 			#endif
 			break;
@@ -1759,9 +1766,9 @@ void LGT_SCR_DW::processButton()
 			LGT_Change_Page(ID_DIALOG_LEVEL_HOME_WAIT);
       		probe.offset.z = 0;
       		soft_endstop._enabled = false;			// deactivate software stop
-			queue.enqueue_one_P(PSTR("G28"));
-			queue.enqueue_one_P(PSTR("G1 F60 Z0")); 
-			queue.enqueue_one_P(PSTR("M2002"));		// auto goto next page
+			queue.enqueue_now_P(PSTR("G28"));
+			queue.enqueue_now_P(PSTR("G1 F60 Z0")); 
+			queue.enqueue_now_P(PSTR("M2002"));		// auto goto next page
 			break;
 		case eBT_LEVEL_AUTO_NEXT:
 			probe.offset.z = current_position[Z_AXIS]; // set new z offset
@@ -1771,9 +1778,9 @@ void LGT_SCR_DW::processButton()
 			break;
 		case eBT_LEVEL_AUTO_NEXT_YES:
 			LGT_Change_Page(ID_MENU_LEVELING_MEASU);
-			queue.enqueue_one_P(PSTR("G28"));
-			queue.enqueue_one_P(PSTR("G29"));
-			queue.enqueue_one_P(PSTR("M2009"));		// auto go to finish dialog
+			queue.enqueue_now_P(PSTR("G28"));
+			queue.enqueue_now_P(PSTR("G29"));
+			queue.enqueue_now_P(PSTR("M2009"));		// auto go to finish dialog
 			break;
 	#endif	// WITH_Z_PROBE
 		case eBT_HOME_LEVEL_SELECT:
@@ -1847,12 +1854,12 @@ void LGT_SCR_DW::LGT_Display_Filename()
 {
 	gcode_num = 0;
 	uint16_t var_addr = ADDR_TXT_PRINT_FILE_ITEM_0;
-    const uint16_t FileCnt = card.get_num_Files();  //FileCnt:Total number of files
-	DEBUG_ECHOLNPAIR("gcode cout: ", FileCnt);
-	for (int i = (FileCnt - 1); i >= 0; i--)     //Reverse order
+    const int16_t file_count = card.get_num_items();  // Total number of entries
+	DEBUG_ECHOLNPAIR("gcode cout: ", file_count);
+	for (int16_t i = file_count - 1; i >= 0; --i)     //Reverse order
 	//for (int i=0;i<FileCnt;i++)                
 	{
-		card.getfilename_sorted(i);
+		card.selectFileByIndexSorted(i);
 		if (!card.flag.filenameIsDir)
 		{
 			DEBUG_ECHOLN(card.longFilename);
@@ -1873,7 +1880,7 @@ FUNCTION:	Printing SD card files to DWIN_Screen
 **************************************/
 void LGT_SCR_DW::LGT_MAC_Send_Filename(uint16_t Addr, uint16_t Serial_Num)
 {
-  	card.getfilename_sorted(Serial_Num);
+  	card.selectFileByIndexSorted(Serial_Num);
 	int len = strlen(card.longFilename);
 	data_storage[0] = DW_FH_0;
 	data_storage[1] = DW_FH_1;
@@ -2066,11 +2073,11 @@ void LGT_SCR_DW::LGT_Stop_Printing()
 	#if ENABLED(POWER_LOSS_RECOVERY)
 		recovery.purge();
 	#endif
-	queue.enqueue_one_P(PSTR("G91"));
-	queue.enqueue_one_P(PSTR("G1 Z10"));
-	// queue.enqueue_one_P(PSTR("G90"));
-	queue.enqueue_one_P(PSTR("G28 X0"));
-	queue.enqueue_one_P(PSTR("M2000"));
+	queue.enqueue_now_P(PSTR("G91"));
+	queue.enqueue_now_P(PSTR("G1 Z10"));
+	// queue.enqueue_now_P(PSTR("G90"));
+	queue.enqueue_now_P(PSTR("G28 X0"));
+	queue.enqueue_now_P(PSTR("M2000"));
 }
 
 /*************************************
@@ -2340,7 +2347,7 @@ static int8_t errorIndex(const char *error, const char *component)
 		return -1;
 
 	#define IS_ERROR(e)  	(isEqual_PP(error, GET_TEXT(e)))
-	#define IS_E1()			(isEqual_PP(component, PSTR(LCD_STR_E0)))
+	#define IS_E1()			(isEqual_PP(component, PSTR(STR_E0)))
 	#define IS_BED()		(isEqual_PP(component, GET_TEXT(MSG_BED)))
 
 	int8_t index;
